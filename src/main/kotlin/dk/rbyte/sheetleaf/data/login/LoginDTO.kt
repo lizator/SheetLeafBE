@@ -1,4 +1,7 @@
 package dk.rbyte.sheetleaf.data.login
 
-data class LoginDTO(var email: String? = null, var password: String? = null) {
-}
+import dk.rbyte.sheetleaf.data.user.UserDTO
+
+data class LoginDTO(var email: String? = null,
+                    var password: String? = null,
+                    var user: UserDTO? = null) {}
