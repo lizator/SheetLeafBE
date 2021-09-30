@@ -1,5 +1,6 @@
 package dk.rbyte.sheetleaf.controllers
 
+import dk.rbyte.sheetleaf.data.user.ProfileDTO
 import dk.rbyte.sheetleaf.data.user.UserDTO
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -16,8 +17,8 @@ class UserController {
 
 
     @GetMapping("/hello2")
-    fun hello2(): ResponseEntity<UserDTO> {
-        return ResponseEntity(UserDTO(email = "Hello@World.!!"), HttpStatus.OK)
+    fun hello2(): ResponseEntity<ProfileDTO> {
+        return ResponseEntity(ProfileDTO(user = UserDTO(name = "TestName", email = "test@gmail.com"), pass = "password"), HttpStatus.OK)
     }
 
 }
