@@ -45,15 +45,15 @@ class PasswordHandler {
         }
     }*/
 
-    fun encryptPassword(password: String, salt: ByteArray? = null): Pair<String?, String?> {
+    fun encryptPassword(password: String, salt: ByteArray? = null): Pair<String, String> {
         val realSalt: ByteArray
         when {
             salt == null -> realSalt = createSalt()
             else -> realSalt = salt
         }
         val passHash = hash(password, realSalt)
-        var genPass: String? = ""
-        var genSalt: String? = ""
+        var genPass = ""
+        var genSalt = ""
         for (i in 0..15) {
             var gen = Integer.toHexString(passHash[i] + 128)
             var gen2 = Integer.toHexString(realSalt[i] + 128)
@@ -70,7 +70,7 @@ class PasswordHandler {
         return Pair(genPass, genSalt)
     }
 
-    fun hash(pass: String, salt: ByteArray?): ByteArray {
+    fun hash(pass: String, salt: ByteArray): ByteArray {
         val spec = PBEKeySpec(pass.toCharArray(), salt, 65536, 128)
         val factory = SecretKeyFactory.getInstance("PBKDF2withHmacSHA512")
         return factory.generateSecret(spec).encoded

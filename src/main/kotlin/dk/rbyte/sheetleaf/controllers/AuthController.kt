@@ -41,31 +41,31 @@ class AuthController {
     @Autowired
     private val userDetailsService: MyUserDetailsService? = null
 
-    @PostMapping("/profile/authenticate")
+    @PostMapping("/open/profile/authenticate")
     @Throws(Exception::class)
     fun createAuthenticationToken(@RequestBody loginDTO: LoginDTO): ResponseEntity<Any> {
         val profile = profileDAO.getProfileByEmail(loginDTO.email) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-        val hashedPair = passHandler.encryptPassword(loginDTO.password!!, passHandler.convertSalt(profile.salt!!))
+        val hashedPair = passHandler.encryptPassword(loginDTO.password!!, passHandler.convertSalt(profile.salt))
 
         if (profile.pass != hashedPair.first) return ResponseEntity(HttpStatus.FORBIDDEN)
 
         val userDetails: UserDetails = userDetailsService!!
             .loadUserByUsername(loginDTO.email!!)
         val jwt: String = jwtTokenUtil!!.generateToken(userDetails)
-        profile.user!!.token = jwt
+        profile.user.token = jwt
         return ResponseEntity.ok<Any>(profile.user)
     }
 
-    @PostMapping("/profile/create")
+    @PostMapping("/open/profile/create")
     fun create(@RequestBody profileDTO: ProfileDTO): ResponseEntity<ProfileDTO>{
         // real Password in pass of userDTO
-        val pass = profileDTO.pass!!
+        val pass = profileDTO.pass
 
         // Will check if user with email already exists
-        val profile = profileDAO.getProfileByEmail(profileDTO.user!!.email) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+        val profile = profileDAO.getProfileByEmail(profileDTO.user.email) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
 
         //If no user with that email
-        if (profile.user!!.id != -1) return ResponseEntity(HttpStatus.CONFLICT)
+        if (profile.user.id != -1) return ResponseEntity(HttpStatus.CONFLICT)
 
 
         // Will generate salt with random time seed
@@ -108,7 +108,7 @@ internal class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     @Throws(Exception::class)
     override fun configure(httpSecurity: HttpSecurity) {
         httpSecurity.csrf().disable()
-            .authorizeRequests().antMatchers("/profile/**").permitAll().anyRequest().authenticated().and()
+            .authorizeRequests().antMatchers("/open/**").permitAll().anyRequest().authenticated().and()
             .exceptionHandling().and().sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
