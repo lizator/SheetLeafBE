@@ -36,12 +36,13 @@ class ProfileDAO {
             db.update("INSERT INTO profiles (name, email, pass, salt) " +
                     "Values (?,?,?,?)", arrayOf<String>(profileDTO.user.name!!, profileDTO.user.email!!, profileDTO.pass, profileDTO.salt))
 
-            db.close()
             return getProfileByEmail(profileDTO.user.email)
         } catch (e: SQLException){
             //DB error, should not happen in production
             e.printStackTrace()
             return null
+        } finally {
+            db.close()
         }
     }
 
