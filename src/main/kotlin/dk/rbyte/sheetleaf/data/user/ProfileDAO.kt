@@ -16,7 +16,7 @@ class ProfileDAO {
 
             if (!res.next()){
                 //No user found
-                return ProfileDTO(user = UserDTO(id = -1))
+                return ProfileDTO(UserDTO(id = -1), "", "")
             } else {
                 return getProfileFromResult(res)
             }
@@ -34,10 +34,10 @@ class ProfileDAO {
         try {
             db.initialize()
             db.update("INSERT INTO profiles (name, email, pass, salt) " +
-                    "Values (?,?,?,?)", arrayOf<String>(profileDTO.user!!.name!!, profileDTO.user!!.email!!, profileDTO.pass!!, profileDTO.salt!!))
+                    "Values (?,?,?,?)", arrayOf<String>(profileDTO.user.name!!, profileDTO.user.email!!, profileDTO.pass, profileDTO.salt))
 
             db.close()
-            return getProfileByEmail(profileDTO.user!!.email)
+            return getProfileByEmail(profileDTO.user.email)
         } catch (e: SQLException){
             //DB error, should not happen in production
             e.printStackTrace()
@@ -45,15 +45,13 @@ class ProfileDAO {
         }
     }
 
-    fun getProfileFromResult(res: ResultSet): ProfileDTO{
-        val profile = ProfileDTO()
+    fun getProfileFromResult(res: ResultSet): ProfileDTO {
         val id = res.getInt("profileid")
         val name = res.getString("name")
         val email = res.getString("email")
-        profile.user = UserDTO(id = id, name = name, email = email)
-        profile.pass = res.getString("pass")
-        profile.salt = res.getString("salt")
-        return profile
+        val pass = res.getString("pass")
+        val salt = res.getString("salt")
+        return ProfileDTO(UserDTO(id = id, name = name, email = email), pass, salt)
     }
 
 }

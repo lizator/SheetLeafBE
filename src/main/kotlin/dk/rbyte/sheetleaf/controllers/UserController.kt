@@ -18,7 +18,7 @@ class UserController {
 
     @GetMapping("/hello2")
     fun hello2(): ResponseEntity<ProfileDTO> {
-        return ResponseEntity(ProfileDTO(user = UserDTO(name = "TestName", email = "test@gmail.com"), pass = "password"), HttpStatus.OK)
+        return ResponseEntity(ProfileDTO(user = UserDTO(name = "TestName", email = "test@gmail.com"), pass = "password", salt = ""), HttpStatus.OK)
     }
 
 }
