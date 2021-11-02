@@ -4,6 +4,7 @@ import dk.rbyte.sheetleaf.data.login.LoginDTO
 import dk.rbyte.sheetleaf.data.login.PasswordHandler
 import dk.rbyte.sheetleaf.data.user.ProfileDAO
 import dk.rbyte.sheetleaf.data.user.ProfileDTO
+import dk.rbyte.sheetleaf.data.user.UserDTO
 import dk.rbyte.sheetleaf.jwt.JwtRequestFilter
 import dk.rbyte.sheetleaf.jwt.JwtUtil
 import dk.rbyte.sheetleaf.jwt.MyUserDetailsService
@@ -57,7 +58,7 @@ class AuthController {
     }
 
     @PostMapping("/open/profile/create")
-    fun create(@RequestBody profileDTO: ProfileDTO): ResponseEntity<ProfileDTO>{
+    fun create(@RequestBody profileDTO: ProfileDTO): ResponseEntity<UserDTO>{
         // real Password in pass of userDTO
         val pass = profileDTO.pass
 
@@ -77,7 +78,17 @@ class AuthController {
         //Creating profile in DB
         val newProfile = profileDAO.createProfile(profileDTO) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
 
-        return ResponseEntity(newProfile, HttpStatus.OK)
+        return ResponseEntity(newProfile.user, HttpStatus.OK)
+    }
+
+    @GetMapping("/api/user/getByID/{id}")
+    fun getByID(@PathVariable id: Int): ResponseEntity<UserDTO>{
+
+        val newProfile = profileDAO.getProfileByEmail("test@gmail.com")
+        if (newProfile != null) {
+            return ResponseEntity(newProfile.user, HttpStatus.OK)
+        }
+        return ResponseEntity(HttpStatus.CONFLICT)
     }
 }
 
@@ -108,7 +119,7 @@ internal class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     @Throws(Exception::class)
     override fun configure(httpSecurity: HttpSecurity) {
         httpSecurity.csrf().disable()
-            .authorizeRequests().antMatchers("/open/**").permitAll().anyRequest().authenticated().and()
+            .authorizeRequests().antMatchers("/**").permitAll().anyRequest().authenticated().and()  //"/open/**").permitAll().anyRequest().authenticated().and()
             .exceptionHandling().and().sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
