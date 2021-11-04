@@ -51,7 +51,7 @@ class CharacterDAO {
         }
     }
 
-    fun CreateCharacter(character: CharacterDTO): CharacterDTO? {
+    fun createCharacter(character: CharacterDTO): CharacterDTO? {
         val db = PostgresDB()
         try {
             db.initialize()
@@ -70,6 +70,34 @@ class CharacterDAO {
 
             return array[array.size-1]
 
+        } catch (e: SQLException) {
+            return null
+        }
+    }
+
+    fun updateCharacter(character: CharacterDTO): CharacterDTO? {
+        val db = PostgresDB()
+        try {
+            db.initialize()
+            db.update(
+                "UPDATE character SET " +
+                        "name = ?, " +
+                        "profileid = ?, " +
+                        "gameid = ?, " +
+                        "sheet = ? " +
+                        "WHERE characterid = ?;",
+                arrayOf(
+                    character.name,
+                    character.profileID.toString(),
+                    character.gameID.toString(),
+                    character.sheet.toString()
+                )
+            )
+            db.close()
+
+
+
+            return getCharacterByID(character.characterID!!);
         } catch (e: SQLException) {
             return null
         }

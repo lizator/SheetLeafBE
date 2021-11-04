@@ -10,15 +10,27 @@ import org.springframework.web.bind.annotation.*
 class CharacterController {
     val dao = CharacterDAO()
 
-    @GetMapping("/api/character/getByProfile/{id}")
-    fun getByProfile(@PathVariable id: Int): ResponseEntity<ArrayList<CharacterDTO>>{
-        val array = dao.getCharactersFromProfile(id) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+    @GetMapping("/api/character/getByProfile/{profileID}")
+    fun getByProfile(@PathVariable profileID: Int): ResponseEntity<ArrayList<CharacterDTO>>{
+        val array = dao.getCharactersFromProfile(profileID) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
         return ResponseEntity(array, HttpStatus.OK)
+    }
+
+    @GetMapping("/api/character/getByID/{characterID}")
+    fun getByID(@PathVariable characterID: Int): ResponseEntity<CharacterDTO>{
+        val charDTO = dao.getCharacterByID(characterID) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+        return ResponseEntity(charDTO, HttpStatus.OK)
     }
 
     @PostMapping("/api/character/create")
     fun CreateCharacter(@RequestBody character: CharacterDTO): ResponseEntity<CharacterDTO>{
-        val newCharacter = dao.CreateCharacter(character)?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+        val newCharacter = dao.createCharacter(character)?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+        return ResponseEntity(newCharacter, HttpStatus.OK)
+    }
+
+    @PostMapping("/api/character/update")
+    fun updateCharacter(@RequestBody character: CharacterDTO): ResponseEntity<CharacterDTO>{
+        val newCharacter = dao.createCharacter(character)?: return ResponseEntity(HttpStatus.BAD_REQUEST)
         return ResponseEntity(newCharacter, HttpStatus.OK)
     }
 }
