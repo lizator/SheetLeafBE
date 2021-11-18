@@ -5,4 +5,5 @@ interface DataField {
     var characterID: Int
     var title: String
     var value: Any
+    var type: FieldTypes
 }
