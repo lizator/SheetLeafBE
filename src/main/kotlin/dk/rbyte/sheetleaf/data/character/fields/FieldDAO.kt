@@ -1,9 +1,6 @@
 package dk.rbyte.sheetleaf.data.character.fields
 
 import dk.rbyte.sheetleaf.data.PostgresDB
-import dk.rbyte.sheetleaf.data.character.fields.longString.LStringFieldDTO
-import dk.rbyte.sheetleaf.data.character.fields.realNumber.IntFieldDTO
-import dk.rbyte.sheetleaf.data.character.fields.shortString.SStringFieldDTO
 import java.sql.ResultSet
 import java.sql.SQLException
 
@@ -15,14 +12,14 @@ class FieldDAO {
         var tableName = ""
         var stringArray: Array<String>? = arrayOf(field.id, field.characterID.toString(), field.title, field.value.toString())
 
-        when (field) {
-            is SStringFieldDTO -> {
+        when (field.type) {
+            FieldTypes.SHORT_STRING_FIELD -> {
                 tableName = "sstringfields"
             }
-            is LStringFieldDTO -> {
+            FieldTypes.LONG_STRING_FIELD-> {
                 tableName = "lstringfields"
             }
-            is IntFieldDTO -> {
+            FieldTypes.REAL_NUMBER_FIELD -> {
                 tableName = "intfields"
             }
             else -> {
@@ -41,7 +38,7 @@ class FieldDAO {
             return getFieldByID(field.id, field.characterID)
 
         } catch (e: SQLException) {
-            e.spliterator()
+            e.printStackTrace()
             return null
         }
     }
@@ -54,14 +51,14 @@ class FieldDAO {
 
             var tableName = ""
 
-            when (field) {
-                is SStringFieldDTO -> {
+            when (field.type) {
+                FieldTypes.SHORT_STRING_FIELD -> {
                     tableName = "sstringfields"
                 }
-                is LStringFieldDTO -> {
+                FieldTypes.LONG_STRING_FIELD-> {
                     tableName = "lstringfields"
                 }
-                is IntFieldDTO -> {
+                FieldTypes.REAL_NUMBER_FIELD -> {
                     tableName = "intfields"
                 }
                 else -> {
@@ -124,7 +121,11 @@ class FieldDAO {
 
             res.next()
 
-            return getDataFieldFromResult(res, tableName)
+            val dataField = getDataFieldFromResult(res, tableName)
+            res.close()
+            db.close()
+
+            return dataField
 
         } catch (e: SQLException) {
             e.printStackTrace()
@@ -177,34 +178,25 @@ class FieldDAO {
     }
 
     private fun getDataFieldFromResult(res: ResultSet, tableName: String): DataField? {
-        var dataField: DataField?
+        var type: FieldTypes?
         when (tableName) {
-            "sstringfield" -> {
-                dataField = SStringFieldDTO(
-                    res.getString("id"),
-                    res.getInt("characterid"),
-                    res.getString("title"),
-                    res.getString("value")
-                )
+            "sstringfields" -> {
+                type = FieldTypes.SHORT_STRING_FIELD
             }
-            "lstringfield" -> {
-                dataField = LStringFieldDTO(
-                    res.getString("id"),
-                    res.getInt("characterid"),
-                    res.getString("title"),
-                    res.getString("value")
-                )
+            "lstringfields" -> {
+                type = FieldTypes.LONG_STRING_FIELD
             }
-            "intfield" -> {
-                dataField = SStringFieldDTO(
-                    res.getString("id"),
-                    res.getInt("characterid"),
-                    res.getString("title"),
-                    res.getInt("value")
-                )
+            "intfields" -> {
+                type = FieldTypes.REAL_NUMBER_FIELD
             }
             else -> return null
         }
+        val dataField = DataField(
+            res.getString("id"),
+            res.getInt("characterid"),
+            res.getString("title"),
+            res.getString("value"),
+            type)
         return dataField
     }
 
