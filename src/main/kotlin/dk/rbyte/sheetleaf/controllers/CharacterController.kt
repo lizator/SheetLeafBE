@@ -1,5 +1,6 @@
 package dk.rbyte.sheetleaf.controllers
 
+import dk.rbyte.sheetleaf.data.character.CharacterCollectionDTO
 import dk.rbyte.sheetleaf.data.character.CharacterDAO
 import dk.rbyte.sheetleaf.data.character.CharacterDTO
 import org.springframework.http.HttpStatus
@@ -17,20 +18,20 @@ class CharacterController {
     }
 
     @GetMapping("/api/character/getByID/{characterID}")
-    fun getByID(@PathVariable characterID: Int): ResponseEntity<CharacterDTO>{
-        val charDTO = dao.getCharacterByID(characterID) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
-        return ResponseEntity(charDTO, HttpStatus.OK)
+    fun getByID(@PathVariable characterID: Int): ResponseEntity<CharacterCollectionDTO>{
+        val charCollectionDTO = dao.getCharacterByID(characterID) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+        return ResponseEntity(charCollectionDTO, HttpStatus.OK)
     }
 
     @PostMapping("/api/character/create")
-    fun CreateCharacter(@RequestBody character: CharacterDTO): ResponseEntity<CharacterDTO>{
-        val newCharacter = dao.createCharacter(character)?: return ResponseEntity(HttpStatus.BAD_REQUEST)
-        return ResponseEntity(newCharacter, HttpStatus.OK)
+    fun CreateCharacter(@RequestBody collection: CharacterCollectionDTO): ResponseEntity<CharacterCollectionDTO>{
+        val newCharacterCollection = dao.createCharacterCollection(collection)?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+        return ResponseEntity(newCharacterCollection, HttpStatus.OK)
     }
 
     @PostMapping("/api/character/update")
-    fun updateCharacter(@RequestBody character: CharacterDTO): ResponseEntity<CharacterDTO>{
-        val newCharacter = dao.createCharacter(character)?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+    fun updateCharacter(@RequestBody collection: CharacterCollectionDTO): ResponseEntity<CharacterCollectionDTO>{
+        val newCharacter = dao.createCharacterCollection(collection)?: return ResponseEntity(HttpStatus.BAD_REQUEST)
         return ResponseEntity(newCharacter, HttpStatus.OK)
     }
 }

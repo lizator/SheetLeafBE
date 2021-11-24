@@ -1,10 +1,16 @@
 package dk.rbyte.sheetleaf.data.character
 
 import dk.rbyte.sheetleaf.data.PostgresDB
+import dk.rbyte.sheetleaf.data.character.fields.DataField
+import dk.rbyte.sheetleaf.data.character.fields.FieldDAO
+import dk.rbyte.sheetleaf.data.character.fields.longString.LStringFieldDTO
+import dk.rbyte.sheetleaf.data.character.fields.realNumber.IntFieldDTO
+import dk.rbyte.sheetleaf.data.character.fields.shortString.SStringFieldDTO
 import java.sql.ResultSet
 import java.sql.SQLException
 
 class CharacterDAO {
+    val fieldDAO = FieldDAO()
 
     fun getCharactersFromProfile(profileID: Int): ArrayList<CharacterDTO>? {
         val db = PostgresDB()
@@ -28,7 +34,7 @@ class CharacterDAO {
         }
     }
 
-    fun getCharacterByID(characterID: Int): CharacterDTO?{
+    fun getCharacterByID(characterID: Int): CharacterCollectionDTO?{
         val db = PostgresDB()
         try {
             db.initialize()
@@ -43,7 +49,10 @@ class CharacterDAO {
                 val character = getCharacterFromResultset(res)
                 res.close()
                 db.close()
-                return character
+
+                val arr = fieldDAO.getCharacterFields(character.characterID!!)?: return null
+
+                return CharacterCollectionDTO(character, arr.values as ArrayList<DataField>)
             }
 
         } catch (e: SQLException) {
@@ -51,8 +60,9 @@ class CharacterDAO {
         }
     }
 
-    fun createCharacter(character: CharacterDTO): CharacterDTO? {
+    fun createCharacterCollection(collection: CharacterCollectionDTO): CharacterCollectionDTO? {
         val db = PostgresDB()
+        val character = collection.character
         try {
             db.initialize()
             db.update(
@@ -64,18 +74,55 @@ class CharacterDAO {
                     character.sheet.toString()
                 )
             )
+
             db.close()
+
 
             val array = getCharactersFromProfile(character.profileID)?: return null
 
-            return array[array.size-1]
+            val newCharacter = array[array.size-1]
+
+            val sheet = newCharacter.sheet!!.split(",")
+
+            val newArr = ArrayList<DataField>()
+
+            for (i in 0..sheet.size-1) {
+                var field: DataField
+                var fieldID = sheet[i]
+                var datafield = collection.fields.get(i)
+                when (fieldID[0]) {
+                    'S' -> {
+                        //Short string field
+                        field = SStringFieldDTO(fieldID, newCharacter.characterID!!, datafield.title, datafield.value)
+                    }
+                    'L' -> {
+                        //Long string field
+                        field = LStringFieldDTO(fieldID, newCharacter.characterID!!, datafield.title, datafield.value)
+                    }
+                    'R' -> {
+                        //Real number field
+                        field = IntFieldDTO(fieldID, newCharacter.characterID!!, datafield.title, datafield.value)
+                    }
+                    else -> {
+                        //error
+                        return null
+                    }
+                }
+                val newField = fieldDAO.createField(field)?: return null
+                newArr.add(newField)
+
+            }
+            return CharacterCollectionDTO(newCharacter, newArr)
+
 
         } catch (e: SQLException) {
+            e.printStackTrace()
             return null
         }
+
     }
 
-    fun updateCharacter(character: CharacterDTO): CharacterDTO? {
+    fun updateCharacter(characterCollectionDTO: CharacterCollectionDTO): CharacterCollectionDTO? {
         val db = PostgresDB()
         try {
             db.initialize()
@@ -87,17 +134,20 @@ class CharacterDAO {
                         "sheet = ? " +
                         "WHERE characterid = ?;",
                 arrayOf(
-                    character.name,
-                    character.profileID.toString(),
-                    character.gameID.toString(),
-                    character.sheet.toString()
+                    characterCollectionDTO.character.name,
+                    characterCollectionDTO.character.profileID.toString(),
+                    characterCollectionDTO.character.gameID.toString(),
+                    characterCollectionDTO.character.sheet.toString()
                 )
             )
             db.close()
 
 
+            for (dataField in characterCollectionDTO.fields)
+                fieldDAO.updateField(dataField)
 
-            return getCharacterByID(character.characterID!!);
+
+            return getCharacterByID(characterCollectionDTO.character.characterID!!);
         } catch (e: SQLException) {
             return null
         }
