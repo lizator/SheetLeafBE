@@ -13,7 +13,7 @@ class CharacterDAO {
         val db = PostgresDB()
         try {
             db.initialize()
-            val res = db.query("SELECT * FROM characters WHERE profileid = ?", arrayOf<String>(profileID.toString()))
+            val res = db.query("SELECT * FROM characters WHERE profileid = ? ORDER BY characterid DESC", arrayOf<String>(profileID.toString()))
                 ?: return null
 
             val array = ArrayList<CharacterDTO>()
@@ -47,9 +47,15 @@ class CharacterDAO {
                 res.close()
                 db.close()
 
-                val arr = fieldDAO.getCharacterFields(character.characterID!!)?: return null
+                val map = fieldDAO.getCharacterFields(character.characterID!!)?: return null
 
-                return CharacterCollectionDTO(character, arr.values as ArrayList<DataField>)
+                val arr = ArrayList<DataField>()
+                for (key in map.keys) {
+                    val dto = map[key]?: return null
+                    arr.add(dto)
+                }
+
+                return CharacterCollectionDTO(character, arr)
             }
 
         } catch (e: SQLException) {
@@ -104,7 +110,7 @@ class CharacterDAO {
         try {
             db.initialize()
             db.update(
-                "UPDATE character SET " +
+                "UPDATE characters SET " +
                         "name = ?, " +
                         "profileid = ?, " +
                         "sheet = ? " +
@@ -125,6 +131,7 @@ class CharacterDAO {
 
             return getCharacterByID(characterCollectionDTO.character.characterID!!);
         } catch (e: SQLException) {
+            e.printStackTrace()
             return null
         }
     }

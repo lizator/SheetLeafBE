@@ -70,7 +70,7 @@ class FieldDAO {
 
             db.update("UPDATE $tableName SET " +
                     "title = ?, " +
-                    "value = ? WHERE" +
+                    "value = ? WHERE " +
                     "id = ? AND " +
                     "characterid = ?", arrayOf(
                     field.title,

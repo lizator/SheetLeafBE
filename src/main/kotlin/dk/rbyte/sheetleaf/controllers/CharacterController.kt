@@ -31,7 +31,7 @@ class CharacterController {
 
     @PostMapping("/api/character/update")
     fun updateCharacter(@RequestBody collection: CharacterCollectionDTO): ResponseEntity<CharacterCollectionDTO>{
-        val newCharacter = dao.createCharacterCollection(collection)?: return ResponseEntity(HttpStatus.BAD_REQUEST)
+        val newCharacter = dao.updateCharacter(collection)?: return ResponseEntity(HttpStatus.BAD_REQUEST)
         return ResponseEntity(newCharacter, HttpStatus.OK)
     }
 }
