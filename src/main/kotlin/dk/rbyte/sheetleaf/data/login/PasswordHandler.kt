@@ -9,8 +9,7 @@ import javax.crypto.spec.PBEKeySpec
 
 class PasswordHandler {
 
-
-    fun checkPass(pass: String, passHash: String, Ssalt: String): Boolean {
+    fun convertSalt(Ssalt:String): ByteArray {
         val salt = ByteArray(16) //converting salt to byte arr
         for (i in 0..15) {
             val first = 2 * i
@@ -19,6 +18,11 @@ class PasswordHandler {
             val x = hex.toLong(16) - 128 //Converting back to having numbers between -128 - 127
             salt[i] = x.toByte()
         }
+        return salt
+    }
+
+    fun checkPass(pass: String, passHash: String, Ssalt: String): Boolean {
+        val salt = convertSalt(Ssalt)
         val genP = encryptPassword(pass, salt) //Generates passhash from password getting testet and given salt: Pair<String?, String?>
         return genP.first == passHash // returns true if password is correct
     }
@@ -41,18 +45,18 @@ class PasswordHandler {
         }
     }*/
 
-    fun encryptPassword(password: String, salt: ByteArray? = null): Pair<String?, String?> {
+    fun encryptPassword(password: String, salt: ByteArray? = null): Pair<String, String> {
         val realSalt: ByteArray
         when {
             salt == null -> realSalt = createSalt()
             else -> realSalt = salt
         }
         val passHash = hash(password, realSalt)
-        var genPass: String? = ""
-        var genSalt: String? = ""
+        var genPass = ""
+        var genSalt = ""
         for (i in 0..15) {
             var gen = Integer.toHexString(passHash[i] + 128)
-            var gen2 = Integer.toHexString(salt!![i] + 128)
+            var gen2 = Integer.toHexString(realSalt[i] + 128)
             if (gen.length < 2) {
                 gen = "0$gen"
             }
@@ -66,7 +70,7 @@ class PasswordHandler {
         return Pair(genPass, genSalt)
     }
 
-    fun hash(pass: String, salt: ByteArray?): ByteArray {
+    fun hash(pass: String, salt: ByteArray): ByteArray {
         val spec = PBEKeySpec(pass.toCharArray(), salt, 65536, 128)
         val factory = SecretKeyFactory.getInstance("PBKDF2withHmacSHA512")
         return factory.generateSecret(spec).encoded

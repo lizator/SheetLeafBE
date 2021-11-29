@@ -18,7 +18,13 @@ repositories {
 
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter:2.5.4")
+    implementation ("org.springframework.boot:spring-boot-starter-security:2.5.4")
+    implementation ("org.springframework.security:spring-security-test:5.5.1")
+    implementation ("jakarta.xml.bind:jakarta.xml.bind-api:2.3.2")
+    implementation ("org.glassfish.jaxb:jaxb-runtime:2.3.2")
+    implementation ("io.jsonwebtoken:jjwt:0.9.1")
+    implementation ("com.google.code.gson:gson:2.8.8")
+    implementation("org.springframework.boot:spring-boot-starter:2.5.5")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.springframework.boot:spring-boot-starter-web:2.5.4")
@@ -26,7 +32,7 @@ dependencies {
     implementation("org.junit.jupiter:junit-jupiter:5.8.0")
     developmentOnly("org.springframework.boot:spring-boot-devtools:2.5.4")
     runtimeOnly("org.postgresql:postgresql:42.2.23.jre7")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:2.5.4")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:2.5.5")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.5.21")
 }
 
