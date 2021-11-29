@@ -24,7 +24,7 @@ class CharacterController {
     }
 
     @PostMapping("/api/character/create")
-    fun CreateCharacter(@RequestBody collection: CharacterCollectionDTO): ResponseEntity<CharacterCollectionDTO>{
+    fun createCharacter(@RequestBody collection: CharacterCollectionDTO): ResponseEntity<CharacterCollectionDTO>{
         val newCharacterCollection = dao.createCharacterCollection(collection)?: return ResponseEntity(HttpStatus.BAD_REQUEST)
         return ResponseEntity(newCharacterCollection, HttpStatus.OK)
     }
