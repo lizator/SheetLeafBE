@@ -19,7 +19,7 @@ repositories {
 
 
 dependencies {
-    implementation ("org.springframework.boot:spring-boot-starter-security:2.5.4")
+    implementation ("org.springframework.boot:spring-boot-starter-security:2.5.6")
     implementation ("org.springframework.security:spring-security-test:5.5.1")
     implementation ("jakarta.xml.bind:jakarta.xml.bind-api:2.3.2")
     implementation ("org.glassfish.jaxb:jaxb-runtime:2.3.2")
@@ -31,9 +31,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web:2.5.4")
     implementation("junit:junit:4.13.2")
     implementation("org.junit.jupiter:junit-jupiter:5.8.0")
-    developmentOnly("org.springframework.boot:spring-boot-devtools:2.5.4")
+    developmentOnly("org.springframework.boot:spring-boot-devtools:2.5.6")
     runtimeOnly("org.postgresql:postgresql:42.2.23.jre7")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:2.5.5")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:2.5.6")
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.5.21")
 }
 
