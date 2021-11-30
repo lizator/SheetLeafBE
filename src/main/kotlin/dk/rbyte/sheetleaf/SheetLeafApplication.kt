@@ -1,5 +1,6 @@
 package dk.rbyte.sheetleaf
 
+import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
@@ -7,5 +8,5 @@ import org.springframework.boot.runApplication
 class SheetLeafApplication
 
 fun main(args: Array<String>) {
-    runApplication<SheetLeafApplication>(*args)
+    SpringApplication.run(SheetLeafApplication::class.java, *args)
 }
