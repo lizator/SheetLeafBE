@@ -82,7 +82,7 @@ class CharacterDAO {
 
             val array = getCharactersFromProfile(character.profileID)?: return null
 
-            val newCharacter = array[array.size-1]
+            val newCharacter = array[0]
 
             val sheet = newCharacter.sheet!!.split(",")
 
